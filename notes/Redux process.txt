@@ -1,0 +1,87 @@
+User clicks button (event)
+    ↓
+onClick fires → dispatch(closeModal())
+    ↓
+closeModal() creates action → { type: "auth/closeModal" }
+    ↓
+Redux reducer updates state
+
+
+Redux Notes
+Key Concepts
+Events vs Actions vs Dispatch
+
+Event — something the user does: click, scroll, keypress (browser level)
+Action — a plain object that tells Redux what happened: { type: "auth/closeModal" } (Redux level)
+Dispatch — the function that sends the action to Redux (like a mailman)
+Reducer — receives the action and updates the state
+
+Flow: User Interaction → State Update
+User clicks button (event)
+    ↓
+onClick fires → dispatch(closeModal())
+    ↓
+closeModal() creates action → { type: "auth/closeModal" }
+    ↓
+Redux reducer updates state
+Analogy
+
+Action = the message
+Dispatch = the mailman that delivers it
+Reducer = the person who reads it and acts on it
+
+
+Auth Slice (authSlice.ts)
+typescriptimport { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+interface AuthState {
+  user: { uid: string; email: string | null } | null;
+  loading: boolean;
+  modalOpen: boolean;
+}
+
+const initialState: AuthState = {
+  user: null,
+  loading: true,
+  modalOpen: false,
+};
+
+const authSlice = createSlice({
+  name: "auth",
+  initialState,
+  reducers: {
+    setUser(state, action: PayloadAction<AuthState["user"]>) {
+      state.user = action.payload;
+      state.loading = false;
+    },
+    clearUser(state) {
+      state.user = null;
+      state.loading = false;
+    },
+    openModal(state) { state.modalOpen = true; },
+    closeModal(state) { state.modalOpen = false; },
+  },
+});
+
+export const { setUser, clearUser, openModal, closeModal } = authSlice.actions;
+export default authSlice.reducer;
+What each reducer does
+
+setUser — sets the user and marks loading as done
+clearUser — clears the user (logout) and marks loading as done
+openModal — sets modalOpen to true
+closeModal — sets modalOpen to false
+
+Dispatching in a component
+typescriptimport { useDispatch } from "react-redux";
+import { closeModal } from "@/lib/slices/authSlice";
+
+const dispatch = useDispatch();
+
+<button onClick={() => dispatch(closeModal())}>Close</button>
+
+Notes
+
+Redux Toolkit uses Immer under the hood — you can mutate state directly in reducers and it converts to immutable updates automatically.
+Always keep PayloadAction<T> typing on reducers that receive a payload — losing it makes the action payload implicitly any.
+When modifying a slice, only change what's needed — don't rewrite style or drop existing logic.
