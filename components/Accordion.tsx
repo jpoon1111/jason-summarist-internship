@@ -7,6 +7,7 @@ export default function Accordion({question, answer, defaultOpen} : {question:st
     const contentRef = useRef<HTMLDivElement>(null)
 
   return  (
+    <>
         <div className="border-b border-[#ddd] mb-2">
             <div onClick={() => setOpen(p => !p)}className="flex justify-between items-center cursor-pointer py-6 gap-2">
                 <div className="font-medium text-2xl relative mb-0 text-[#032b41] transition-all duration-300">{question}</div>
@@ -19,6 +20,7 @@ export default function Accordion({question, answer, defaultOpen} : {question:st
                 </p>
             </div>
         </div>
+    </>
     );
  
 }
