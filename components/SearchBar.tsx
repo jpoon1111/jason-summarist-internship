@@ -6,7 +6,7 @@ function SearchBar() {
   return (
     <div className='bg-white border-b border-[#e1e7ea] h-20 z-[1]'>
       <div className='relative flex items-center justify-between px-[32px] max-w-[1070px] mx-auto h-full'>
-        <figure><img src="logo" alt="" /></figure>
+        <div></div>
           
           {/* Search */}
           <div className="flex items-center w-full gap-[24px] max-w-[340px]">

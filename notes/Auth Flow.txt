@@ -1,0 +1,211 @@
+================================================================
+AUTH FLOW — SUMMARIST
+================================================================
+Complete flow from Firebase credentials to your UI and back
+================================================================
+
+
+STEP 1 — .env.local
+----------------------------------------------------------------
+Holds your Firebase project credentials (your "social security card")
+Never pushed to GitHub
+
+    NEXT_PUBLIC_FIREBASE_API_KEY=...
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
+    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=...
+    NEXT_PUBLIC_FIREBASE_APP_ID=...
+
+↓ read by
+
+
+STEP 2 — lib/firebase.ts
+----------------------------------------------------------------
+Reads .env.local, initializes Firebase once, exports auth and db
+
+    const firebaseConfig = {
+        apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY  ← from .env.local
+    }
+    const app = initializeApp(firebaseConfig)  ← starts Firebase
+    export const auth = getAuth(app)           ← auth is born here
+    export const db = getFirestore(app)        ← db is born here
+
+↓ auth imported by
+
+
+STEP 3 — components/ReduxProvider.tsx
+----------------------------------------------------------------
+Listens to Firebase 24/7 and dispatches to Redux when auth changes
+
+    import { auth } from '@/lib/firebase'           ← auth arrives here
+    import { setUser, clearUser } from authSlice
+
+    onAuthStateChanged(auth, (firebaseUser) => {    ← Firebase calls this automatically
+        if(firebaseUser) {
+            store.dispatch(setUser({ uid, email })) ← sends user to Redux
+            store.dispatch(setSubscribed(true))     ← sets subscription status
+        } else {
+            store.dispatch(clearUser())             ← wipes user from Redux
+        }
+    })
+
+    Fires in 4 situations:
+    1. App first loads    → checks if user was already logged in
+    2. User logs in       → firebaseUser = { uid, email } → setUser
+    3. User logs out      → firebaseUser = null → clearUser
+    4. Page refreshes     → checks again → setUser or clearUser
+
+↓ store imported from
+
+
+STEP 4 — lib/store.ts
+----------------------------------------------------------------
+Creates the single Redux store and registers the auth reducer
+
+    import authReducer from "./slices/authSlice"   ← reducer arrives here
+
+    export const store = configureStore({
+        reducer: {
+            auth: authReducer  ← state lives here: { user, loading, modalOpen, isSubscribed }
+        }
+    })
+
+    export type RootState = ReturnType<typeof store.getState>  ← shape exported
+    export type AppDispatch = typeof store.dispatch            ← dispatch type exported
+
+↓ types imported by
+
+
+STEP 5 — lib/hooks.ts
+----------------------------------------------------------------
+Wraps Redux hooks with your store's types for autocomplete and type safety
+
+    import type { RootState, AppDispatch } from "./store"  ← types arrive here
+
+    export const useAppDispatch = () => useDispatch<AppDispatch>()         ← typed dispatch
+    export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector ← typed selector
+
+↓ hooks imported by
+
+
+STEP 6 — lib/slices/authSlice.ts
+----------------------------------------------------------------
+Defines what the auth state looks like and how each action changes it
+
+    interface AuthState {
+        user: { uid: string; email: string | null } | null  ← who is logged in
+        loading: boolean       ← are we waiting for Firebase?
+        modalOpen: boolean     ← is the modal open?
+        isSubscribed: boolean  ← does the user have a subscription?
+    }
+
+    setUser(state, action)       → state.user = action.payload   ← called on login
+    clearUser(state)             → state.user = null             ← called on logout
+    openModal(state)             → state.modalOpen = true        ← called by any button
+    closeModal(state)            → state.modalOpen = false       ← called after login success
+    setSubscribed(state, action) → state.isSubscribed = payload  ← called on login
+
+↓ actions + state read by
+
+
+STEP 7 — components/AuthModal.tsx
+----------------------------------------------------------------
+Reads Redux state to show/hide, calls Firebase to authenticate
+
+    import { auth } from "@/lib/firebase"            ← auth arrives here from firebase.ts
+    import { useAppDispatch, useAppSelector }         ← hooks arrive here from hooks.ts
+    import { closeModal } from authSlice              ← action arrives here
+
+    const modalOpen = useAppSelector(state => state.auth.modalOpen) ← reads from Redux
+    if (!modalOpen) return null                                      ← hidden until needed
+
+    // user clicks Login:
+    await signInWithEmailAndPassword(auth, email, password) ← sends credentials to Firebase
+    dispatch(closeModal())   ← tells Redux to hide modal
+    router.push("/for-you")  ← redirects user
+
+    // user clicks Register:
+    await createUserWithEmailAndPassword(auth, email, password) ← creates account in Firebase
+
+    // user clicks Google:
+    await signInWithPopup(auth, new GoogleAuthProvider()) ← opens Google popup
+
+    // user clicks Guest:
+    await signInAnonymously(auth) ← logs in without credentials
+
+    // user clicks Forgot Password:
+    await sendPasswordResetEmail(auth, email) ← sends reset email
+
+↓ mounted globally in
+
+
+STEP 8 — app/layout.tsx
+----------------------------------------------------------------
+Wraps the entire app so Redux and AuthModal are available on every page
+
+    <ReduxProvider>      ← Redux store available to entire app
+        <AuthModal />    ← modal mounted once, works on every page
+        {children}       ← every page in your app
+    </ReduxProvider>
+
+
+================================================================
+COMPLETE CHAIN
+================================================================
+
+.env.local
+    → lib/firebase.ts          (initializes Firebase, exports auth + db)
+    → ReduxProvider.tsx        (listens for auth changes, dispatches to Redux)
+    → lib/store.ts             (holds all state, registers reducers)
+    → lib/hooks.ts             (typed wrappers for dispatch and selector)
+    → lib/slices/authSlice.ts  (defines state shape and actions)
+    → components/AuthModal.tsx (reads Redux, calls Firebase auth methods)
+    → app/layout.tsx           (mounts everything globally)
+
+
+================================================================
+LOGIN FLOW EXAMPLE
+================================================================
+
+User clicks Login button
+    → dispatch(openModal())
+    → authSlice sets modalOpen = true
+    → AuthModal renders (reads modalOpen from Redux)
+    → User types email + password
+    → handleSubmit() runs
+    → signInWithEmailAndPassword(auth, email, password)
+    → Firebase verifies on Google's servers
+    → SUCCESS: onAuthStateChanged fires in ReduxProvider
+    → store.dispatch(setUser({ uid, email }))
+    → store.dispatch(setSubscribed(true))
+    → dispatch(closeModal())
+    → router.push("/for-you")
+    → Every component reading state.auth.user sees the logged in user
+
+
+================================================================
+PAGE REFRESH FLOW
+================================================================
+
+User refreshes the page
+    → app/layout.tsx renders ReduxProvider
+    → ReduxProvider mounts → useEffect runs onAuthStateChanged
+    → Firebase checks its session → finds user is still logged in
+    → store.dispatch(setUser({ uid, email }))
+    → Redux state has user immediately
+    → Protected actions navigate directly instead of opening modal
+
+
+================================================================
+LOGOUT FLOW
+================================================================
+
+User logs out
+    → Firebase signs out
+    → onAuthStateChanged fires with null
+    → store.dispatch(clearUser())
+    → state.user = null
+    → state.isSubscribed = false
+    → Any protected action opens modal again instead of navigating
+
+================================================================

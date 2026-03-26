@@ -34,6 +34,7 @@ const FAQS = [
 
 
 export default function ChoosePlanPage() {
+  const [openIndex, setOpenIndex] = useState(0);
 
   return(
     <div className="relative flex flex-col transition-all duration-300">
@@ -120,8 +121,8 @@ export default function ChoosePlanPage() {
 
             
             <div className="faq__wrapper">
-              {FAQS.map((faq) => (
-                <Accordion key={faq.question} question={faq.question} answer={faq.answer} defaultOpen={faq.defaultOpen} />
+              {FAQS.map((faq, index) => (
+                <Accordion key={faq.question} question={faq.question} answer={faq.answer} isOpen={index===openIndex} onToggle={()=>setOpenIndex(index === openIndex ? -1 : index)}/>
               ))}
 
               
@@ -129,10 +130,63 @@ export default function ChoosePlanPage() {
 
             </div>
 
+            
+
 
           </div>
          </div>
-         
+         <footer className="bg-[#f1f6f4]">
+              <div className="row max-w-[1070px] w-full mx-auto px-6">
+                <div className="footer-top--wrapper grid grid-cols-4 text-[14px] mt-8 mx-auto mb-16">
+                  <div className="block">
+                    <h3 className="font-semibold mb-4 text-[18px] text-[#032b41]">Actions</h3>
+                    <ul>
+                      <li className="mb-3 leading-none"><a className="text-[#394547] text-[14px] cursor-not-allowed">Summarist Magazine</a></li>
+                      <li className="mb-3 leading-none"><a className="text-[#394547] text-[14px] cursor-not-allowed">Cancel Subscription</a></li>
+                      <li className="mb-3 leading-none"><a className="text-[#394547] text-[14px] cursor-not-allowed">Help</a></li>
+                      <li className="mb-3 leading-none"><a className="text-[#394547] text-[14px] cursor-not-allowed">Contact us</a></li>
+                    </ul>
+
+                  </div>
+                  <div className="block">
+                    <h3 className="font-semibold mb-4 text-[18px] text-[#032b41]">Useful Links</h3>
+                    <ul>
+                      <li className="mb-3 leading-none"><a className="text-[#394547] text-[14px] cursor-not-allowed">Pricing</a></li>
+                      <li className="mb-3 leading-none"><a className="text-[#394547] text-[14px] cursor-not-allowed">Summarist Business</a></li>
+                      <li className="mb-3 leading-none"><a className="text-[#394547] text-[14px] cursor-not-allowed">Gift Cards</a></li>
+                      <li className="mb-3 leading-none"><a className="text-[#394547] text-[14px] cursor-not-allowed">Authors & Publishers</a></li>
+                    </ul>
+
+                  </div>
+                  <div className="block">
+                    <h3 className="font-semibold mb-4 text-[18px] text-[#032b41]">Company</h3>
+                    <ul>
+                      <li className="mb-3 leading-none"><a className="text-[#394547] text-[14px] cursor-not-allowed">About</a></li>
+                      <li className="mb-3 leading-none"><a className="text-[#394547] text-[14px] cursor-not-allowed">Careers</a></li>
+                      <li className="mb-3 leading-none"><a className="text-[#394547] text-[14px] cursor-not-allowed">Partners</a></li>
+                      <li className="mb-3 leading-none"><a className="text-[#394547] text-[14px] cursor-not-allowed">Code of Conduct</a></li>
+                    </ul>
+
+                  </div>
+                  <div className="block">
+                    <h3 className="font-semibold mb-4 text-[18px] text-[#032b41]">Other</h3>
+                    <ul>
+                      <li className="mb-3 leading-none"><a className="text-[#394547] text-[14px] cursor-not-allowed">Sitemap</a></li>
+                      <li className="mb-3 leading-none"><a className="text-[#394547] text-[14px] cursor-not-allowed">Legal Notice</a></li>
+                      <li className="mb-3 leading-none"><a className="text-[#394547] text-[14px] cursor-not-allowed">Terms of Service</a></li>
+                      <li className="mb-3 leading-none"><a className="text-[#394547] text-[14px] cursor-not-allowed">Privacy Policies</a></li>
+                    </ul>
+
+                  </div>
+                </div>
+
+                <div className="flex justify-center items center">
+                  <p className="text-[#032b41] font-medium">Copyright © 2023 Summarist.</p>
+                </div>
+
+              </div>
+
+            </footer>
 
       </div>
     </div>    

@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image"; 
@@ -6,25 +7,18 @@ import axios from "axios";
 import { AiOutlineAudio, AiOutlineClockCircle, AiOutlineRead, AiOutlineStar } from "react-icons/ai";
 import { BsBookmark } from "react-icons/bs";
 import { HiOutlineLightBulb } from "react-icons/hi";
+import { Book } from "@/lib/book";
 
-interface Book {
-  id: string;
-  title: string;
-  author: string;
-  subTitle: string;
-  imageLink: string;
-  audioLink: string;
-  totalRating: number;
-  averageRating: number;
-  keyIdeas: number;
-  type: string;
-  status: string;
-  subscriptionRequired: boolean;
-  summary: string;
-  tags: string[];
-  bookDescription: string;
-  authorDescription: string;
-}
+//useAppDispatch — from lib/hooks.ts The typed hook that gives you the dispatch function to send actions to the Redux store
+//useAppSelector — from lib/hooks.ts The typed hook that lets you read specific pieces of state from the Redux store — used to get state.auth.user
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+//openModal — from lib/slices/authSlice.ts The action creator that when dispatched sets modalOpen = true in Redux — which causes AuthModal to show
+import { openModal } from "@/lib/slices/authSlice";
+
+//useRouter — from next/navigation Next.js built-in hook that gives you the router object for programmatic navigation — used to redirect the user to the player page after clicking Read or Listen
+import { useRouter } from "next/navigation";
+
+
 
 const BASE_URL = "https://us-central1-summaristt.cloudfunctions.net/getBook";
 
@@ -75,6 +69,16 @@ export default function BookDetailPage() {
     const { id } = useParams<{id: string}>();
     const [book, setBook] = useState<Book | null>(null);
     const [loading, setLoading] = useState(true);
+    const [saved, setSaved] = useState(false);
+    const [saving, setSaving] = useState(false);
+
+    //Getting the messenger — so you can send actions to the Redux store like dispatch(openModal())
+    const dispatch = useAppDispatch();
+    //Reading from the store — checking if someone is logged in. user will be null if nobody is logged in or { uid, email } if someone is
+    const user = useAppSelector((state) =>state.auth.user)
+    const subscribed = useAppSelector((state) => state.auth.isSubscribed)
+    //Getting the navigation tool — so you can redirect the user to another page like router.push("/player/123") after they click Read or Listen
+    const router = useRouter();
 
     useEffect(()=> {
         if(!id) return;
@@ -83,7 +87,32 @@ export default function BookDetailPage() {
         .catch(console.error)
         .finally(()=> setLoading(false));
     }, [id]);
+
+    const handleProtectedAction = (destination: string) => {
+        if(!user) {
+            dispatch(openModal()); // No user login detected - open the login modal
+            return;
+        }
+        if(book?.subscriptionRequired && !subscribed){
+            router.push(`/choose-plan`);
+            return;
+        }
+            
+        
+        router.push(destination);// user is logged in — navigate to destination
+        
+    };
   
+    const handleAddToLibrary = async () => {
+        if(!user) {
+            dispatch(()=> openModal())
+        }
+
+        if (!book || saving || saved) return;
+        
+        setSaving(true);
+    }
+
     return (
 
 
@@ -143,14 +172,20 @@ export default function BookDetailPage() {
 
                     <div className="flex gap-4 mb-6">
                         {/* TODO — wire Read button to navigate to the reader view */}
-                        <button className="flex items-center justify-center gap-2 bg-[#032b41] text-white w-[144px] h-[48px] rounded hover:opacity-80 transition-opacity">
+                        <button 
+                            onClick={() => handleProtectedAction(`/player/${id}`)}
+                            className="flex items-center justify-center gap-2 bg-[#032b41] text-white w-[144px] h-[48px] rounded hover:opacity-80 transition-opacity"
+                        >
                             <div className="flex w-[24px] h-[24px]">
                                 <AiOutlineRead className="text-2xl"/>
                             </div>
                             <span>Read</span>
                         </button>
                         {/* TODO — wire Listen button to open AudioPlayer with book.audioLink */}
-                        <button className="flex items-center justify-center gap-2 bg-[#032b41] text-white w-[144px] h-[48px] rounded hover:opacity-80 transition-opacity">
+                        <button 
+                            onClick={()=> handleProtectedAction(`/player/${id}`)}
+                            className="flex items-center justify-center gap-2 bg-[#032b41] text-white w-[144px] h-[48px] rounded hover:opacity-80 transition-opacity"
+                        >
                             <div className="flex w-[24px] h-[24px]">
                                 <AiOutlineAudio className="text-2xl"/>
                             </div>
@@ -158,7 +193,7 @@ export default function BookDetailPage() {
                         </button>
                     </div>
                     {/* TODO — wire to Firebase: save book.id to user's library in Firestore */}                
-                    <button className="flex items-center gap-2 text-[#0365f2] font-medium text-[18px] mb-10 hover:text-[#044298] transition-colors">
+                    <button onClick={handleAddToLibrary} className="flex items-center gap-2 text-[#0365f2] font-medium text-[18px] mb-10 hover:text-[#044298] transition-colors">
                         <div className="flex w-[20px] h-[20px]">
                             <BsBookmark className="w-full h-full"/>
                         </div>

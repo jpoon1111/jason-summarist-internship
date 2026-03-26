@@ -6,13 +6,15 @@ interface AuthState {
   user: { uid: string; email: string | null } | null; // user is either an object with uid & email, or null (not logged in)
   loading: boolean;   // true while we wait to know if a user is logged in
   modalOpen: boolean; // controls whether the auth modal is open or closed
+  isSubscribed: boolean;
 }
-
+//  ^ From ^
 // Setting the initial values for the auth state when the app first loads
 const initialState: AuthState = {
   user: null,       // no user logged in at start
   loading: true,    // assume loading until Firebase/auth check completes
   modalOpen: false, // modal is closed at start
+  isSubscribed: false,
 };
 
 // createSlice bundles the name, initialState, and reducers into one slice object
@@ -32,6 +34,11 @@ const authSlice = createSlice({
     clearUser(state) {
       state.user = null;     // wipe the user from state
       state.loading = false; // auth check is done, stop loading
+      state.isSubscribed = false;
+    },
+    setSubscribed(state, action: PayloadAction<boolean>){
+      state.isSubscribed = action.payload;
+
     },
 
     // openModal sets modalOpen to true → triggers the modal to show in the UI
@@ -44,7 +51,7 @@ const authSlice = createSlice({
 
 // Exporting individual action creators so components can dispatch them
 // ⚠️ Fix: added openModal and closeModal — they were missing from the original export
-export const { setUser, clearUser, openModal, closeModal } = authSlice.actions;
+export const { setUser, clearUser, openModal, closeModal, setSubscribed } = authSlice.actions;
 
 // Exporting the reducer to be registered in the Redux store
 export default authSlice.reducer;

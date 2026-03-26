@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import BookCard from "@/components/BookCard";
-import { BsFillPlayFill } from "react-icons/bs";
+import { BsFillPlayFill, BsFillStarFill } from "react-icons/bs";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
+
 
 
 interface Book {
@@ -128,9 +129,12 @@ export default function ForYouPage() {
     // .finally(()=> setLoadingSuggested(false));
       
   }, []);
-  useEffect(() => {
-  console.log("Selected book updated:", selectedBook)
-}, [selectedBook])
+
+const fullStar = selectedBook? Math.floor(selectedBook.averageRating): 0;
+const halfStar = selectedBook? selectedBook.averageRating % 1 !== 0 : false ;
+const ratingFullStar = Array(fullStar).fill("_").map((_, index) => {return <BsFillStarFill key={index}  />})
+
+
 
   return (
     
@@ -176,8 +180,9 @@ export default function ForYouPage() {
                 <div className="text-[#394547] text-[14px] mb-4 font-light">{selectedBook.author}</div>
                 <div className="flex items-center gap-2">
                   <div className="flex items-center justify-center w-10 h-10 bg-black rounded-full pl-[3px]">
-                    {/* TODO* map stars*/}
-                    <BsFillPlayFill className="text-white text-2xl"/>
+                    {/* TODO* map stars*/}hello
+                    {ratingFullStar}
+                    
                   </div>
                   <div className="text-[14px] font-medium text-[#032b41]">3 mins 23 secs</div>
                 </div>
@@ -216,7 +221,7 @@ export default function ForYouPage() {
                   image={book.imageLink}
                   audio={book.audioLink}
                   duration="" //filled in feature 4.b
-                  rating={String(book.averageRating ?? 0)}
+                  rating={String(book.averageRating ?? "")}
                   subscriptionRequired={book.subscriptionRequired}
                 />
               )

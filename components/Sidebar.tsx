@@ -79,7 +79,7 @@ import { openModal } from '@/lib/slices/authSlice';
         <div className='flex items-center h-14 text-[#032b41] cursor-pointer hover:bg-[#f0efef]' onClick={() => dispatch(openModal())}>
           <div className='w-[5px] h-full mr-4 bg-transparent'></div>
           <div className='flex items-center justify-center mr-2 w-6 h-6'>
-            <AiOutlineLogin className='text-sm' />
+            <AiOutlineLogin size={24} />
           </div>
         </div>
       </div>
