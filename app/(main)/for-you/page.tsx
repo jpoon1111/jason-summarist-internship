@@ -208,7 +208,7 @@ export default function ForYouPage() {
               new Array(7).fill(null).map((_, i) => <BookRowSkeleton key={i} />)
             ) : (
               // when loading is finished, generate BookCard with their info
-              recommended.map(book=>(
+              recommended.map(book => (
                 <BookCard
                   key={book.id}
                   id={book.id}
@@ -220,14 +220,13 @@ export default function ForYouPage() {
                   rating={String(book.averageRating ?? 0)}
                   subscriptionRequired={book.subscriptionRequired}
                 />
-              )
-            ))}
-            
+              ))
+            )}
           </div>
           
           <div className="mb-8">
             {loading ? (
-                <div style={{...shimmer, height: 24, width: 150, marginBottom: 20}} />
+              <div style={{...shimmer, height: 24, width: 150, marginBottom: 20}} />
             ) : (
               <>
                 <h2 className="text-[22px] font-bold text-[#032b41] mb-4">
@@ -239,25 +238,24 @@ export default function ForYouPage() {
               </>
             )}
             <div className="flex overflow-x-auto no-scrollbar gap-4 snap-x snap-mandatory mb-8">
-              {loading?
-                  //generate only 7 books from here
-                  Array.from({ length: 7}).map((_,i)=> <BookRowSkeleton key={i} /> 
-                ) : (
-                  suggested.map(book=>(
-                    <BookCard 
-                      key={book.id}
-                      id={book.id}
-                      title={book.title}
-                      author={book.author}
-                      subTitle={book.subTitle}
-                      image={book.imageLink}
-                      audioLink={book.audioLink}
-                      rating={String(book.averageRating ?? "")}
-                      subscriptionRequired= {book.subscriptionRequired}
-                    />
-                  ))
-                )
-              }
+              {loading ? (
+                // generate only 7 skeletons
+                Array.from({ length: 7 }).map((_, i) => <BookRowSkeleton key={i} />)
+              ) : (
+                suggested.map(book => (
+                  <BookCard 
+                    key={book.id}
+                    id={book.id}
+                    title={book.title}
+                    author={book.author}
+                    subTitle={book.subTitle}
+                    image={book.imageLink}
+                    audioLink={book.audioLink}
+                    rating={String(book.averageRating ?? "")}
+                    subscriptionRequired={book.subscriptionRequired}
+                  />
+                ))
+              )}
             </div>
           </div>
           

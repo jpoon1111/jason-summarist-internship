@@ -42,10 +42,9 @@ function page() {
         <h3>Finished</h3>
         <p>{`13 Item s`}</p>
         <BookCard id={demo.id} title={demo.title} author={demo.author} subTitle={demo.subTitle} image={demo.imageLink} audioLink={demo.audioLink} rating={'4'} />
-        
-        Type '{}' is missing the following properties from type 'BookProps': id, title, author, subTitle, and 3 more.
     </ProtectedRoute>
   )
 }
 
 export default page
+

@@ -87,5 +87,4 @@ export async function POST(req:NextRequest) {
             {status:  500}
         );
     }
-    console.log("Monthly Price ID:", process.env.NEXT_PUBLIC_MONTHLY_PRICE_ID);
 }

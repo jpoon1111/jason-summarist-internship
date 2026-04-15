@@ -77,7 +77,7 @@ function Settings() {
                     )}
 
                 </div>
-                    <div className="flex fkex-col items-start gap-2">
+                    <div className="flex flex-col items-start gap-2">
                         <div className="text-[18px] font-bold text-[#032b41]">Email</div>
                         <div className="text-[#032b41]">{user.email}</div>
 
