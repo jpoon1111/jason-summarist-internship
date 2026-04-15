@@ -10,7 +10,7 @@ import { AiFillHome, AiOutlineLogin, AiOutlineQuestionCircle, AiOutlineSearch, A
 import { BsBookmark, BsPencil } from 'react-icons/bs';
 import { openModal } from '@/lib/slices/authSlice';
 
- export default function Sidebar() {
+export default function Sidebar() {
   const pathname = usePathname();
   const dispatch = useAppDispatch();
 
@@ -19,9 +19,11 @@ import { openModal } from '@/lib/slices/authSlice';
   return (
     <div className="bg-[#f7faf9] w-[200px] min-w-[200px] fixed top-0 left-0 h-screen z-[1000] transition-all duration-300">
       <div className="flex items-center justify-center h-[60px] pt-4 max-w-[160px] mx-auto">
+        <Link href="/">
         <Image src={summaristLogo} alt="Summarist" width={495} height={114} className="w-full h-[40px] object-contain" style={{color: "transparent"}} />
+        </Link>
     </div>
-    <div className="flex flex-col justify-between h-[calc(100vh-60px)] pb-5 overflow-y-auto">
+    <div className="flex flex-col justify-between h-[calc(100vh-60px)] pb-5">
       <div className="flex-1 mt-10">
         <Link href="/for-you" className="flex items-center h-14 text-[#032b41] mb-2 cursor-pointer hover:bg-[#f0efef]">
           <div className={`w-[5px] h-full mr-4 ${isActive("/for-you") ? "bg-[#2bd97c]" : "bg-transparent"}`} />

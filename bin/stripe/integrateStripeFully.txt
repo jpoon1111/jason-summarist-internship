@@ -1,0 +1,18 @@
+If  you want to integrate it fully
+
+
+For this project, you don’t need to fully set up webhooks.
+
+Since this is more of a learning/demo setup, it’s totally fine to simulate the subscription logic
+
+If you want to integrate Stripe more fully, here are the basic steps:
+
+Create products/prices in Stripe (test mode)
+
+Use the frontend to start a checkout session
+
+Set up a backend endpoint to create the session
+
+(Optional) Use Stripe CLI or ngrok to test webhooks locally
+
+Update your database when a payment is successful

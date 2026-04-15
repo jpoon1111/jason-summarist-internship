@@ -18,7 +18,7 @@ import {
 } from "firebase/auth"; // All of the above are imported from the firebase/auth package
 
 // Local project files
-import { auth } from "@/lib/firebase"; // auth is imported from local firebase config — the initialized Firebase app instance
+import { auth } from "@/lib/firebase"; // auth is imported from local firebase config — the initialized Firebase app instance(because you have it set to getAuth in firebase you dont need to import auth and app to do it here)
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"; // typed Redux hooks imported from local hooks file
 import { closeModal } from "@/lib/slices/authSlice"; // closeModal is a Redux action imported from local authSlice — sets modalOpen to false
 

@@ -92,7 +92,7 @@ export default function ForYouPage() {
     Promise.all([
           axios.get(BASE_URL, {params: {status: "selected"} }),
           axios.get(BASE_URL, {params: {status: "recommended"}}),
-          axios.get(BASE_URL, { params: {status: "suggested"}}),
+          axios.get(BASE_URL, {params: {status: "suggested"}}),
 
     ])
     .then(([selectedRes, recommendedRes, suggestedRes ]) => {
@@ -129,7 +129,8 @@ export default function ForYouPage() {
       
   }, []);
   useEffect(() => {
-  console.log("Selected book updated:", selectedBook)
+  //console.log("Selected book updated:", selectedBook)
+  console.log("Recommended book updated:", recommended)
 }, [selectedBook])
 
   return (
@@ -154,7 +155,7 @@ export default function ForYouPage() {
           <Link
           
             href={`/book/${selectedBook.id}`}
-            className="flex justify-between w-full md:w-2/3 bg-[#fbefd6] rounded-sm p-6 mb-6 gap-6 no-underline text-inherit hover:bg-[#f3e4c8] transition-colors"
+            className="flex justify-between w-full bg-[#fbefd6] rounded-sm p-6 mb-6 gap-6 no-underline text-inherit hover:bg-[#f3e4c8] transition-colors"
           >
             <div className="text-[#032b41] w-[40%]">
               {selectedBook.subTitle}
@@ -173,13 +174,12 @@ export default function ForYouPage() {
               
               <div className="w-full">
                 <h3 className="font-semibold text-[#032b41] mb-2 text-lg">{selectedBook.title}</h3>
-                <div className="text-[#394547] text-[14px] mb-4 font-light">{selectedBook.author}</div>
+                <div className="text-[#394547] text-[14px] mb-4">{selectedBook.author}</div>
                 <div className="flex items-center gap-2">
                   <div className="flex items-center justify-center w-10 h-10 bg-black rounded-full pl-[3px]">
-                    {/* TODO* map stars*/}
                     <BsFillPlayFill className="text-white text-2xl"/>
                   </div>
-                  <div className="text-[14px] font-medium text-[#032b41]">3 mins 23 secs</div>
+                  <div className="text-[10px] font-medium text-[#032b41]">3 mins 23 secs</div>
                 </div>
               </div>
             </div>
@@ -197,15 +197,17 @@ export default function ForYouPage() {
           ) : (
             <>
               <h2 className="text-[22px] font-bold text-[#032b41]">Recommended For You</h2>
-              <p className="text-sm text-[#394547] mb-4">We think you’ll like these</p>
+              <p className="font-light text-[#394547] mb-4">We think you’ll like these</p>
 
             </>
           )}
           
           <div className="flex overflow-x-auto no-scrollbar gap-4 snap-x snap-mandatory mb-8">
             {loading ? (
+              // generate 7 skeletons as placeholders for this array
               new Array(7).fill(null).map((_, i) => <BookRowSkeleton key={i} />)
             ) : (
+              // when loading is finished, generate BookCard with their info
               recommended.map(book=>(
                 <BookCard
                   key={book.id}
@@ -214,8 +216,7 @@ export default function ForYouPage() {
                   author={book.author}
                   subTitle={book.subTitle}
                   image={book.imageLink}
-                  audio={book.audioLink}
-                  duration="" //filled in feature 4.b
+                  audioLink={book.audioLink}
                   rating={String(book.averageRating ?? 0)}
                   subscriptionRequired={book.subscriptionRequired}
                 />
@@ -232,13 +233,14 @@ export default function ForYouPage() {
                 <h2 className="text-[22px] font-bold text-[#032b41] mb-4">
                   Suggested Books
                 </h2>
-                <p className="font-light text-[#394547] mb-4 text-sm">
-                  Browse these curated picks
+                <p className="font-light text-[#394547] mb-4">
+                  Browse these books
                 </p>
               </>
             )}
             <div className="flex overflow-x-auto no-scrollbar gap-4 snap-x snap-mandatory mb-8">
               {loading?
+                  //generate only 7 books from here
                   Array.from({ length: 7}).map((_,i)=> <BookRowSkeleton key={i} /> 
                 ) : (
                   suggested.map(book=>(
@@ -249,8 +251,7 @@ export default function ForYouPage() {
                       author={book.author}
                       subTitle={book.subTitle}
                       image={book.imageLink}
-                      audio={book.audioLink}
-                      duration="" // filled in 4.b
+                      audioLink={book.audioLink}
                       rating={String(book.averageRating ?? "")}
                       subscriptionRequired= {book.subscriptionRequired}
                     />

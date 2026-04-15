@@ -7,7 +7,8 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react'
 import { BsPauseFill, BsPlayFill } from 'react-icons/bs';
-import { TbRewindBackward10, TbRewindForward10 } from 'react-icons/tb';
+import { RefreshIconLeft } from '@/public/assets/RefreshIconLeft';
+import { RefreshIconRight } from '@/public/assets/RefreshIconRight';
 import axios from 'axios';
 
 const BASE_URL = "https://us-central1-summaristt.cloudfunctions.net/getBook";
@@ -94,16 +95,16 @@ export default function PlayerPage() {
             </p>
         </div>
         </div>
-        {/* Fixed audio bar at bottom Wrapper */} 
-        <div className="w-full h-[80px] max-md:max-w-flex items-center justify-between bg-[#042330] px-10 fixed bottom-0 left-0 z-[9998] max-md:h-[180px] max-md:flex-col max-md:px-6 max-md:py-4">
+        {/* Fixed audio bar at bottom AUDIOTRACK Wrapper */} 
+        <div className="flex w-full h-[80px] max-md:max-w-flex items-center justify-between bg-[#042330] px-10 fixed bottom-0 left-0 z-[9998] max-md:h-[180px] max-md:flex-col max-md:px-6 max-md:py-4">
         {/* Track info */}
-        <div className='flex gap-3 w-1/3 max-md:w-full'>
-            <figure className='flex max-w-[48px]'>
+        <div className='flex gap-3 w-full sm:w-[calc(100%/3)] items-center'>
+            <figure className='flex max-w-[48px] min-w-[48px] min-h-[48px] max-h-[48px]'>
                 {book?.imageLink && (
-                    <Image src={book?.imageLink || ""} alt="book" className='w-full h-full' width={48} height={48}/>
+                        <Image src={book?.imageLink || ""} alt="book" className='w-full h-full min-w-[48px]' width={48} height={48}/>  
                 )}
             </figure>
-            <div className='text-[#fff] text-[14px] flex flex-col gap-1 justify-center'>
+            <div className='text-[#fff] text-[14px] flex flex-col gap-0 justify-center'>
                 <p>{book?.title}</p>
                 <span className='text-[#bac8ce]'>{book?.author}</span>
             </div>
@@ -111,28 +112,28 @@ export default function PlayerPage() {
     
 
         {/* Controls */}
-        <div className='flex items-center justify-center gap-6 w-1/3'>
+        <div className='flex items-center justify-center gap-6 sm:w-[calc(100%/3)]'>
             <Button onClick={()=> handleskip(-10)} className="rounded-full cursor-pointer flex items-center justify-center">
-                <TbRewindBackward10 className='w-[28px] h-[28px] stroke-[#fff] ' />
+                <RefreshIconLeft className='w-[28px] h-[28px] stroke-[#fff] ' />
             </Button>
 
             <Button onClick={togglePlay} className={`flex items-center justify-center bg-[#fff] rounded-full w-[40px] h-[40px] cursor-pointer`}>
                 {
                     isPlaying ?
-                        <BsPauseFill className={`text-[#042330]`} />
+                        <BsPauseFill className={`text-[#042330]`} size={32}/>
                         :
-                        <BsPlayFill className={`text-[#042330] ml-1`}/>
+                        <BsPlayFill className={`text-[#042330] ml-1`} size={32}/>
                 }
             </Button>
 
             <Button onClick={()=> handleskip(10)} className={`rounded-full cursor-pointer flex items-center justify-center`}>
-                <TbRewindForward10 className='w-[28px] h-[28px] stroke-[#fff]'/>
+                <RefreshIconRight className='w-[28px] h-[28px] stroke-[#fff]'/>
             </Button>
         </div>
         
             {/* Progress bar */}
-            <div className='flex items-center gap-4 w-1/3'>
-                <span className='text-[#fff] text-[14px]'>{formatTime(currentTime)}</span>
+            <div className='flex items-center gap-4 w-full sm:w-[calc(100%/3)]'>
+                <span className='text-[#fff] text-[14px] whitespace-nowrap'>{formatTime(currentTime)}</span>
                 <input 
                     type="range"
                     min={0}
@@ -142,7 +143,7 @@ export default function PlayerPage() {
                     className='rounded-sm h-[4px] max-w-[300px] w-full cursor-pointer outline-none appearance-none'
                     style={{background: `linear-gradient(to right, #2bd97c ${progressPercent}%, #6d787d ${progressPercent}%)`}}
                 />
-                <span className='text-[#fff] text-[14px]'>{formatTime(duration)}</span>
+                <span className='text-[#fff] text-[14px] whitespace-nowrap'>{formatTime(duration)}</span>
             </div>
     </div>
     {book?.audioLink && (

@@ -1,20 +1,40 @@
 // Importing createSlice (to create a Redux slice) and PayloadAction (to type action payloads)
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+/// tHese "interface"are for typescript to let Typescript know what I am looking for
+
+
+interface Subscription {
+  plan: string;
+  startDate: string | null;
+  endDate: string | null;
+  status: 'active' | 'expired' | 'cancelled' | 'none';
+}
+
 // Defining the shape of the auth state using a TypeScript interface
 interface AuthState {
   user: { uid: string; email: string | null } | null; // user is either an object with uid & email, or null (not logged in)
   loading: boolean;   // true while we wait to know if a user is logged in
   modalOpen: boolean; // controls whether the auth modal is open or closed
-  isSubscribed: boolean;
+  isSubscribed: boolean; /// should be isBookmarked? for to be added to library
+  subscription: Subscription; /// this is expecting an object from "interface Subscription"
 }
+
 //  ^ From ^
-// Setting the initial values for the auth state when the app first loads
+// Below - Setting the initial values for the auth state when the app first loads
+
 const initialState: AuthState = {
   user: null,       // no user logged in at start
   loading: true,    // assume loading until Firebase/auth check completes
   modalOpen: false, // modal is closed at start
   isSubscribed: false,
+  subscription: {
+      plan: 'none',
+      startDate: null,
+      endDate: null,
+      status: 'none',
+  },
+
 };
 
 // createSlice bundles the name, initialState, and reducers into one slice object
@@ -35,10 +55,19 @@ const authSlice = createSlice({
       state.user = null;     // wipe the user from state
       state.loading = false; // auth check is done, stop loading
       state.isSubscribed = false;
+      state.subscription = initialState.subscription; // <- Reset subscription
     },
+    
+    /// sets bookmarks by dispatching them
     setSubscribed(state, action: PayloadAction<boolean>){
       state.isSubscribed = action.payload;
 
+    },
+
+    // Sets Subscription by dispatch
+    setSubscription(state, action: PayloadAction<Subscription>){
+      state.subscription = action.payload;
+      state.isSubscribed = action.payload.status === 'active';
     },
 
     // openModal sets modalOpen to true → triggers the modal to show in the UI
@@ -51,7 +80,7 @@ const authSlice = createSlice({
 
 // Exporting individual action creators so components can dispatch them
 // ⚠️ Fix: added openModal and closeModal — they were missing from the original export
-export const { setUser, clearUser, openModal, closeModal, setSubscribed } = authSlice.actions;
+export const { setUser, clearUser, openModal, closeModal, setSubscribed, setSubscription } = authSlice.actions;
 
 // Exporting the reducer to be registered in the Redux store
 export default authSlice.reducer;

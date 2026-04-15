@@ -3,12 +3,24 @@
 import SearchBar from "@/components/SearchBar";
 import Sidebar from "@/components/Sidebar";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { closeModal } from "@/lib/slices/authSlice";
+import { closeModal, openModal } from "@/lib/slices/authSlice";
+import { useEffect } from "react";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   
     const modalOpen = useAppSelector((state) => state.auth.modalOpen);
     const dispatch = useAppDispatch();
+    
+    const user = useAppDispatch((state) => state.auth.user);
+    const loading = useAppSelector((state) => state.auth.loading);
+
+    useEffect(()=> {
+      if(loading) return
+
+      if(!user) dispatch(openModal());
+
+    }, [user, loading]);
+
   return (
     <>
       <Sidebar />

@@ -1,3 +1,5 @@
+/// this is your Redux Provider
+
 "use client";
 
 // ============================================================
@@ -43,7 +45,7 @@ import { auth } from '@/lib/firebase';
 //           sets user to { uid, email } in Redux state
 // clearUser — dispatched when Firebase detects no user
 //             sets user to null in Redux state
-import { setUser, clearUser, setSubscribed } from '@/lib/slices/authSlice'
+import { setUser, clearUser, setSubscribed, setSubscription } from '@/lib/slices/authSlice'
 
 // ============================================================
 // AuthListener Component — a separate component that lives inside Provider
@@ -53,41 +55,83 @@ import { setUser, clearUser, setSubscribed } from '@/lib/slices/authSlice'
 //   - keeping it separate makes the code cleaner and easier to read
 // ============================================================
 function AuthListener ({children}: {children: React.ReactNode}) {
+  
   useEffect(() => {
     // onAuthStateChanged sets up a real-time listener
     // Firebase calls this function automatically whenever auth state changes
     // firebaseUser is either a Firebase User object or null
     const unsubscribe = onAuthStateChanged(auth, 
-      async (firebaseUser) => {
-        
-        if(firebaseUser) {
+      async (firebaseUser) => {    
+        if (firebaseUser) {
+          //Get subscription data from Firestore
+          const {db: FireStore} = await import ('@/lib/firebase');
+
           // firebaseUser exists — someone is logged in
           // dispatch setUser to update Redux state with their uid and email
           // this makes user !== null so handleProtectedAction will navigate instead of opening modal
-          store.dispatch(setUser({uid: firebaseUser.uid, email: firebaseUser.email}));
+          store.dispatch( setUser({uid: firebaseUser.uid, email: firebaseUser.email}) );
 
           //this checks firestore for subscription status
           const { db } = await import("@/lib/firebase");
-          const {doc, getDoc} = await import("firebase/firestore");
+          const { doc, getDoc } = await import("firebase/firestore");
 
-          const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+          const userDoc = await getDoc( doc(db, "users", firebaseUser.uid) );
           
-          if (userDoc.exists()){
-            const data = userDoc.data();
-            store.dispatch(setSubscribed(data.isSubscribed ?? false))
-          } else {
-            store.dispatch(setSubscribed(false));
+          if ( userDoc.exists() ) {   
+              const data = userDoc.data();
+              store.dispatch(setUser({uid: firebaseUser.uid, email:firebaseUser.email}));
+              store.dispatch(setSubscribed(data.isSubscribed ?? false));              
+              
+              //if user's subscription is true 
+              if (data.subscription) {
+                // then set subscription
+                store.dispatch(setSubscription(
+                  {
+                    plan:      data.subscription.plan || 'none',
+                    startDate: data.subscription.startDate || null,
+                    endDate:   data.subscription.endDate || null,
+                    status:    data.subscription.status || 'none',
+                  }
+                ))
+              } else {
+                // create new user document in firestore
+                // reason why " import {setDoc } from 'firebase/firestore' "  isn't imported at the top is because of heavy payload
+                //    {payload is when everything needs to be loaded at once before user 
+                //      sees anything to reduce this payload you
+                //      want to only load this when user logs in }
+                const { setDoc } = await import('firebase/firestore');
+                
+                try {      
+                  await setDoc( doc(db, 'users', firebaseUser.uid), 
+                      {
+                        uid:firebaseUser.uid,
+                        email: firebaseUser.email,
+                        isSubscribed: false, 
+                        subscription: {
+                          plan: 'none',
+                          startDate: null, 
+                          endDate: null,
+                          status: 'none',
+                        },
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                      }
+                    );
+                } catch(error){
+                  store.dispatch(setSubscribed(false));
+                  console.log("Error creating user document:", error)
+                }
+            
+            }
           }
-          
-        }else{
-          // firebaseUser is null — nobody is logged in
-          // dispatch clearUser to set user back to null in Redux state
-          // this makes !user = true so handleProtectedAction will open the modal
-          store.dispatch(clearUser());
-          
+        } else {
+        // firebaseUser is null — nobody is logged in
+        // dispatch clearUser to set user back to null in Redux state
+        // this makes !user = true so handleProtectedAction will open the modal
+        store.dispatch(clearUser());
         }
-
-    });
+      }
+    );
 
     // cleanup function — returned from useEffect
     // unsubscribe() stops the Firebase listener when the component unmounts

@@ -15,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="fonts-sans">
         {/* // 
         ReduxProvider already handles auth internally
           <ReduxProvider>

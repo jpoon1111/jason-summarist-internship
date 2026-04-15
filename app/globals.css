@@ -1,6 +1,19 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap");
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "Roboto", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --font-main: "Roboto", sans-serif;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-main);
+  }
+}
 
 /* @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap");
 @import "tailwindcss";
@@ -509,7 +522,7 @@ button:disabled {
 
   .review__body {
     font-size: 14px;
-
+*/
 
 /* ─── AUTH MODAL FIXES ─────────────────────────────────────────────────────── */
 

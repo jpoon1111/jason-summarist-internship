@@ -6,6 +6,10 @@ import Accordion from "@/components/Accordion"
 import pricingTop from "@/public/assets/pricing-top.png"; // update path if needed
 import { AiFillFileText } from "react-icons/ai";
 import { FaHandshake } from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import { useAppSelector } from "@/lib/hooks";
+import { subscriptionService } from "@/lib/SubscriptionService";
+import axios from "axios";
 
 
 const FAQS = [
@@ -34,14 +38,65 @@ const FAQS = [
 
 
 export default function ChoosePlanPage() {
+  // This is the FAQ index that keeps track of the current index between 1-4 but initial value is 0
   const [openIndex, setOpenIndex] = useState(0);
+  //sets the plan options with either monthly or yearly with a initial value of yearly
+  const [selectedPlan, setSelectedPlan] = useState<'yearly' | 'monthly'>('yearly')// <- this track selected plan
+  const [loading, setLoading] = useState(false);// loading set to false until user selects a plan and hit "Start your first month"
 
+  const router = useRouter() // used for navigation
+  const user = useAppSelector((state) => state.auth.user);//← Check if user is logged in
+  const isSubscribed = useAppSelector((state)=> state.auth.isSubscribed)//← Check if already subscribed
+
+    //if user is logged in and already have a subscription then redirect them to the "/for-you" page
+    if(isSubscribed){
+      router.replace('/for-you');//will be redirected to for-you
+      return null;// this stops all other functions after this line from running if isSubscribed is true
+    }
+  
+  const handleSubcribe =async () => {
+      // Check if user is logged in(this is the guard if they are not signed in )
+      if (!user) {//if not logged in then...
+        router.replace('/') //// Redirect to home page to login
+        return; // this will return but actually returns undefined behind the scenes
+                // it will stop here if user is not logged in
+      }
+  
+      setLoading(true);//set loading is try because user hit button to call this function
+
+      try {
+        //async call to get the status of this user to see if they selected a plan and update "yearly"
+        //NOTE This bypass stripe and talk to firebase directly
+        // const result = await subscriptionService.activatePremium(
+        //   user.uid,
+        //   //this will check if user picked either yearly or monthly  by checking "yearly"
+        //   // then this value gets updated in the firebase
+        //   selectedPlan === 'yearly' ? 'premium_yearly' : 'premium_monthly'
+        // );
+
+        const {data} = await axios.post(
+          '/api/checkout', {
+            priceId: selectedPlan === 'yearly' ?
+            process.env.NEXT_PUBLIC_STRIPE_PRICE_YEARLY //refernces the yearly by product_id  from env by var
+            : process.env.NEXT_PUBLIC_STRIPE_PRICE_MONTHLY,
+            userId: user.uid,
+          },
+        );
+
+        router.push(data.url);
+
+      } catch (error) {
+        console.error('Subscription error', error);
+      } finally {
+        setLoading(false);
+      }
+  }
+
+  {/*JSX*/}
   return(
     <div className="relative flex flex-col transition-all duration-300">
-      {/* Opacity overlay */}
-      {/* <div className="fixed top-0 left-0 w-full h-full bg-[#3a4649] transition-opacity duration-[400ms] ease-in-out z-10"></div> */}
       <div className="w-full ">
-
+         {/* Head Section */}      
          <div className="plan__header--wrapper relative text-center w-full pt-12 mb-6 ">
             <div className="max-w-[1000px] mx-auto text-white px-6">
               <div className="text-[48px] font-bold mb-10">
@@ -57,6 +112,7 @@ export default function ChoosePlanPage() {
 
          <div className="max-w-[1070px] w-full mx-auto px-6">
           <div className="py-10 w-full">
+            {/* Features Section */}
             <div className="grid gird-cols-3 justify-items-center text-center gap-6 max-w-[800px] mx-auto mb-14">
               <div>
                 <figure className="flex justify-center text-[#032b41] mb-3">
@@ -86,10 +142,23 @@ export default function ChoosePlanPage() {
               </div>
             </div>
 
-            <h2 className="text-[32px] text-[#032b41] text-center mb-8 font-bold">Choose the plan that fits you</h2>
-            <div className="flex gap-6 p-6 bg-[#f1f6f4] rounded cursor-pointer max-w-[680px] mx-auto border-4 border-[#bac8ce] plan__card--active">
+            <h2 className="text-[32px] text-[#032b41] text-center mb-8 font-bold">
+              Choose the plan that fits you
+            </h2>
+            {/* Yearly Plan - Make it selectable  */}
+            <div 
+              onClick={() => setSelectedPlan('yearly')}
+              className={`flex gap-6 p-6 bg-[#f1f6f4] rounded cursor-pointer max-w-[680px] mx-auto transition-all
+                  ${ 
+                    selectedPlan === 'yearly' ? 
+                      'border-4 border-[#2bd97c] plan__card--active'
+                      :
+                      'border-4 border-[#bac8ca]'
+                  }
+              `}
+            >
               <div className="relative w-6 h-6 rounded-full border-2 border-black flex items-center justify-center">
-                <div className="absolute w-1.5 h-1.5 bg-black rounded-full"></div>
+                {selectedPlan === 'yearly' && (<div className="absolute w-1.5 h-1.5 bg-black rounded-full"></div>)}
               </div>
               <div className="plan__card--content">
                 <div className="text-[24px] font-bold text-[#032b41] mb-2">Premium Plus Yearly</div>
@@ -102,8 +171,20 @@ export default function ChoosePlanPage() {
               <div>or</div>
             </div>
             
-            <div className="flex gap-6 p-6 bg-[#f1f6f4] border-4 border-[#bac8ce] rounded cursor-pointer max-w-[680px] mx-auto">
-              <div className="relative w-6 h-6 rounded-full border-2 border-black flex items-center justify-center"></div>
+            <div 
+              onClick={() => setSelectedPlan('monthly')}                
+              className={`flex gap-6 p-6 bg-[#f1f6f4] rounded cursor-pointer max-w-[680px] mx-auto transition-all
+                  ${ 
+                    selectedPlan === 'monthly' ? 
+                      'border-4 border-[#2bd97c] plan__card--active'
+                      :
+                      'border-4 border-[#bac8ca]'
+                  }
+              `}
+            >
+              <div className="relative w-6 h-6 rounded-full border-2 border-black flex items-center justify-center">
+                {selectedPlan === 'monthly' && (<div className="absolute w-1.5 h-1.5 bg-black rounded-full"></div>)}
+              </div>
               <div>
                 <div className="text-[24px] font-bold text-[#032b41] mb-2">Premium Monthly</div>
                 <div className="text-[24px] font-bold text-[#032b41] mb-2">$9.99/month</div>
@@ -111,27 +192,26 @@ export default function ChoosePlanPage() {
               </div>
             </div>
 
-
+            {/* CTA Button */}
             <div className="plan__card--cta bg-white sticky bottom-0 z-[1] py-8 flex flex-col items-center gap-4">
-              <button className="bg-[#2bd97c] text-[#032b41] w-[300px] h-10 rounded text-base transition-colors duration-200 flex items-center justify-center min-w-[180px]">
+              <button 
+                onClick={handleSubcribe}
+                disabled={loading}
+                className="bg-[#2bd97c] text-[#032b41] w-[300px] h-10 rounded text-base transition-colors duration-200 flex items-center justify-center min-w-[180px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 Start your first month
               </button>
               <div className="text-xs text-[#6b757b] text-center">30-day money back guarantee, no questions asked.</div>
             </div>
 
-            
+            {/* FAQ Section */}
             <div className="faq__wrapper">
-              {FAQS.map((faq, index) => (
-                <Accordion key={faq.question} question={faq.question} answer={faq.answer} isOpen={index===openIndex} onToggle={()=>setOpenIndex(index === openIndex ? -1 : index)}/>
-              ))}
-
-              
-
-
+              {// This gets FAQ and generate a list of FAQ questions and answers
+                FAQS.map((faq, index) => (
+                  <Accordion key={faq.question} question={faq.question} answer={faq.answer} isOpen={index===openIndex} onToggle={()=>setOpenIndex(index === openIndex ? -1 : index)}/>
+                ))
+              }
             </div>
-
-            
-
 
           </div>
          </div>
@@ -187,7 +267,6 @@ export default function ChoosePlanPage() {
               </div>
 
             </footer>
-
       </div>
     </div>    
 
