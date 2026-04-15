@@ -6,7 +6,7 @@ import { AiFillStar, AiOutlineClockCircle } from "react-icons/ai";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 
-interface BookProps {
+export interface BookProps {
   id: string;
   title: string;
   author: string;

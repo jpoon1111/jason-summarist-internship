@@ -1,9 +1,9 @@
 import Link from "next/link"; // Next.js client-side navigation — makes the entire card a clickable link to the book's detail page
-import { Book } from "@/components/BookCard"; // Shared Book TypeScript interface — defines the shape of the book data object
+import { BookProps } from "@/components/BookCard"; // Shared Book TypeScript interface — defines the shape of the book data object
 
 // ── PROPS INTERFACE ─────────────────────────────────────────────────────────
 interface SelectedBookProps {
-  book: Book | null;  // The featured book to display — null while the API fetch is still in progress
+  book: BookProps | null;  // The featured book to display — null while the API fetch is still in progress
   duration: string;   // Human-readable audio duration string (e.g. "3 mins 05 secs") — computed in page.tsx from the <audio> element's metadata
   loading: boolean;   // True while the book is being fetched — triggers the skeleton placeholder instead of the card
 }
@@ -65,7 +65,7 @@ export default function SelectedBook({ book, duration, loading }: SelectedBookPr
           style={{ height: 140, width: 140, minWidth: 140 }}
         >
           <img
-            src={book.imageLink}
+            src={book.image}
             alt={book.title}
             style={{ display: "block", width: "100%", height: "100%", objectFit: "cover" }} // objectFit cover: fills the box without distorting the image
           />

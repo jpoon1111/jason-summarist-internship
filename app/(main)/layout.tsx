@@ -11,7 +11,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     const modalOpen = useAppSelector((state) => state.auth.modalOpen);
     const dispatch = useAppDispatch();
     
-    const user = useAppDispatch((state) => state.auth.user);
+    const user = useAppSelector((state) => state.auth.user);
     const loading = useAppSelector((state) => state.auth.loading);
 
     useEffect(()=> {
