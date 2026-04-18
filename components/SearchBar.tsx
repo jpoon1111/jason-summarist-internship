@@ -66,9 +66,9 @@ export default function SearchBar() {
   //  Load audio duration for each result only if results arrives so it doesnt run when a user search for a query
   useEffect(()=> {
     // map is the most common but not the best because it returns an array of undefined so it requires garbage collection
-    results.map((book) =>{
+    //results.map((book) =>{
     //using forEach won't generate garbage and usually is best for this situation
-    //results.forEach((book)=> {
+    results.forEach((book)=> {
 
       //if there is no audioLink from book or if "durations" state already have an id from book then return
       if(!book.audioLink || durations[book.id]) return;
@@ -112,7 +112,7 @@ export default function SearchBar() {
           <div className='flex items-center w-full gap-[24px] max-w-[340px]'>
             <div className='flex items-center w-full'>
               <div className='relative w-full'>
-                <input suppressHydrationWarning placeholder="Search for books" type="text" value={query} onChange={(e) => setQuery(e.target.value)} className='h-10 w-full px-4 pr-10 outline-none bg-[#f1f6f4] text-[#14px] text-[#042330] border-2 border-[#e1e7ea] rounded-lg  transition-all'/>
+                <input suppressHydrationWarning placeholder="Search for books" type="text" value={query} onChange={(e) => setQuery(e.target.value)} className='h-10 w-full px-4 pr-10 outline-none bg-[#f1f6f4] text-[14px] text-[#042330] border-2 border-[#e1e7ea] rounded-lg focus:border-[#2be080] transition-all'/>
                 {/* This is the Search Bar that shows a close icon or a search icon*/}
                 <div className='absolute right-[8px] top-0 flex h-full items-center justify-end border-l-2 border-[#e1e7ea] pl-2'>
                   {query ? (
@@ -137,7 +137,7 @@ export default function SearchBar() {
           
           {/* This is showing the actual drop down results based on search */}
           {showDropdown && (
-            <div className='absolute top-[80px] right-6 ww-full max-w-p[440px] max-h-[640px] overflow-y-auto bg-white border border-[#e1e7ea] shadow-md z-50 flex flex-col'>
+            <div className='absolute top-[104px] right-6 p-4 w-full max-w-[440px] max-h-[640px] overflow-y-auto bg-white border border-[#e1e7ea] shadow-md z-50 flex flex-col'>
                {/* display "Searching..." if it is currently loading */}
               {loading && (
                 <div className='p-4 text-[14px] text-[#6b757b]'> Searching...</div>
@@ -145,7 +145,7 @@ export default function SearchBar() {
               {/* if searching is false and no longer loading and the result is 0 then show "No Books" */}
             
               {!loading && results.length === 0 && (
-                <div className='p-4 text-[14px]'>
+                <div className='p-4 text-[14px] text-[#6b757b]'>
                   No books found for "{query}"
                 </div>
               )}
@@ -156,7 +156,7 @@ export default function SearchBar() {
                   key={book.id}
                   href={`/book/${book.id}`}
                   onClick={() => { setQuery("");setResults([]); }}
-                  className='flex items-center gap-6 px-4 pyy-3 h-[120px] border-b border-[#e1e7ea] last:border-b-0 hover:bg-[#f1f6f4] transition-colors no-underline'
+                  className='flex items-center gap-6 px-4 py-4 h-[120px] border-b border-[#e1e7ea] last:border-b-0 hover:bg-[#f1f6f4] transition-colors no-underline'
                 >
                     <figure className='w-[80px] h-[80px] min-w-[80px] m-0'>
                       <img src={book.imageLink} alt={book.title} 
@@ -166,14 +166,14 @@ export default function SearchBar() {
 
                     {/* Book Info */}
                     <div className='flex flex-col gap-1'>
-                      <div className='text-[16px] font-medium text-'>
+                      <div className='text-[16px] font-medium text-[#032b41]'>
                         {book.title}
                       </div>
-                      <div>
+                      <div className='text-[14px] font-light text-[#6b757b]'>
                         {book.author}
                       </div>
-                      <div>
-                        <AiOutlineClockCircle />
+                      <div className='flex items-center gap-1 text-[14px] font-light text-[#6b757b]'>
+                        <AiOutlineClockCircle className={'w-4 h-4'} />
                         <span>{durations[book.id] ?? "..."}</span>
                       </div>
                     </div>

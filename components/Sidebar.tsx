@@ -1,20 +1,36 @@
 "use client";
 
-import React from 'react'
 import Image from 'next/image';
 import summaristLogo from "../public/assets/summarist-logo.webp";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAppDispatch } from '@/lib/hooks';
-import { AiFillHome, AiOutlineLogin, AiOutlineQuestionCircle, AiOutlineSearch, AiOutlineSetting } from 'react-icons/ai';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { AiFillHome, AiOutlineLogin, AiOutlineLogout, AiOutlineQuestionCircle, AiOutlineSearch, AiOutlineSetting } from 'react-icons/ai';
 import { BsBookmark, BsPencil } from 'react-icons/bs';
 import { openModal } from '@/lib/slices/authSlice';
+import { RootState } from '@/lib/store';
+import { auth } from '@/lib/firebase';
+import { signOut } from 'firebase/auth';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const dispatch = useAppDispatch();
+  const user = useAppSelector( (state:RootState) =>state.auth.user)
+
 
   const isActive = (path:string) => pathname === path;
+
+  const handleAuthAction = async () => {
+    if(user) {
+      try{
+        await signOut(auth);
+      } catch (err) {
+        console.error("Sign-out for User error: ", err);
+      }
+    } else {
+      dispatch(openModal());
+    }
+  };
 
   return (
     <div className="bg-[#f7faf9] w-[200px] min-w-[200px] fixed top-0 left-0 h-screen z-[1000] transition-all duration-300">
@@ -32,7 +48,7 @@ export default function Sidebar() {
             <AiFillHome size={24} />
           </div>
 
-          <span className='text-sm'> For You</span>
+          <span className='text-sm'>For You</span>
 
         </Link>
 
@@ -62,7 +78,7 @@ export default function Sidebar() {
       </div>
 
       <div>
-        <Link href="/settings" className='flex items-center h-14 text-[#032b41] mb-2 cursor-pointer hovder:bg-[#f0efef]'>
+        <Link href="/settings" className='flex items-center h-14 text-[#032b41] mb-2 cursor-pointer hover:bg-[#f0efef]'>
           <div className={`w-[5px] h-full mr-4 ${isActive("/settings") ? "bg-[#2bd97c]" : "bg-transparent"}`}></div>
           <div className='flex items-center justify-center mr-2 w-6 h-6'>
             <AiOutlineSetting size={24} />
@@ -78,10 +94,21 @@ export default function Sidebar() {
           <span className='text-sm'> Help & Support</span>
         </div>
 
-        <div className='flex items-center h-14 text-[#032b41] cursor-pointer hover:bg-[#f0efef]' onClick={() => dispatch(openModal())}>
+        <div 
+          className='flex items-center h-14 text-[#032b41] cursor-pointer hover:bg-[#f0efef]' 
+          onClick={handleAuthAction}
+          title={user? "Logout" : "Login"}//tooltip on hover
+        >
           <div className='w-[5px] h-full mr-4 bg-transparent'></div>
           <div className='flex items-center justify-center mr-2 w-6 h-6'>
-            <AiOutlineLogin size={24} />
+            {/* will display Logo based on logout and login but evaluate false first because by default user is not logged in until it is check */}
+            {user ? (
+              <AiOutlineLogout size={24} />
+            ) : (
+              <AiOutlineLogin size={24} />
+            )}
+            <span>{user ? "Logout" : "Login"}</span>
+            
           </div>
         </div>
       </div>

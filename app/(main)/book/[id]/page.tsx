@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import Image from "next/image"; 
 import axios from "axios";
 import { AiOutlineAudio, AiOutlineClockCircle, AiOutlineRead, AiOutlineStar } from "react-icons/ai";
-import { BsBookmark } from "react-icons/bs";
+import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
 import { HiOutlineLightBulb } from "react-icons/hi";
 import { Book } from "@/lib/book";
 
@@ -17,6 +17,8 @@ import { openModal } from "@/lib/slices/authSlice";
 
 //useRouter — from next/navigation Next.js built-in hook that gives you the router object for programmatic navigation — used to redirect the user to the player page after clicking Read or Listen
 import { useRouter } from "next/navigation";
+import { isBookSaved, saveBook, type SavedBookData } from "@/lib/libraryService";
+import { unsavedBook } from "@/lib/libraryService";
 
 
 
@@ -28,6 +30,8 @@ const shimmer: React.CSSProperties = {
     animation: "shimmer 1.5s infinite",
     borderRadius: 4,
 };
+
+
 
 function BookDetailSkeleton() {
   return (
@@ -88,6 +92,21 @@ export default function BookDetailPage() {
         .finally(()=> setLoading(false));
     }, [id]);
 
+    //useEffect to check of user is falsy(not logged in) or !user — no one is logged in, so there's no point checking Firebase for saved books
+    // checks if book ID: !id — the book ID doesn't exist in the URL, so we don't know which book to check
+    useEffect(()=>{
+        
+        if(!user || !id) {
+            setSaved(false);
+            return;
+        }
+        //isBookSaved is an async call to retrieve books that are saved (imported from libraryService.ts)
+        isBookSaved(user.uid, id)
+            .then(setSaved)
+            .catch(()=> setSaved(false));
+    }, [user, id]);
+
+    //check if user is logged in or have an account if not then open login/signup (openModal imported from authSlice)
     const handleProtectedAction = (destination: string) => {
         if(!user) {
             dispatch(openModal()); // No user login detected - open the login modal
@@ -97,21 +116,59 @@ export default function BookDetailPage() {
             router.push(`/choose-plan`);
             return;
         }
-            
-        
         router.push(destination);// user is logged in — navigate to destination
-        
     };
   
+    // this async means this function can use await inside. It will always return a Promise (but we don't use the return value here)
     const handleAddToLibrary = async () => {
+            console.log("Current user:", user);  // ← ADD THIS
+    console.log("User UID:", user?.uid); // ← ADD THIS
+        // if user = falsy (not logged in) then open modal, then tell it to return so it doesn't continue
         if(!user) {
-            dispatch(()=> openModal())
+            dispatch(openModal())
+            return;
         }
+        // if there is no book object(represented by !book) or saved = true (which is false by default) then return 
 
-        if (!book || saving || saved) return;
+        if (!book || saving) return; // use this if it is recommended as a guard clause instead of checking saved
         
+        //we will set the "saved" to true
         setSaving(true);
-    }
+        
+        //this runs only user is true(logged in)
+        try{
+            //check if saved is (false === false) (because the initial state is set to false that books are not saved by default)
+            if(saved){
+                // Toggle off - to remove from library by running an async call unsaveBook imported from libraryService
+                await unsaveBook(user.uid, id);
+                setSaved(false);
+            } else {
+                //Save to library that will be the same shape/blueprint of SavedBookData imported from libraryService.ts
+                const bookData: SavedBookData = {
+                    id,
+                    title: book.title,
+                    author: book.author,
+                    subTitle: book.subTitle,
+                    imageLink: book.imageLink,
+                    audioLink: book.audioLink,
+                    averageRating: book.averageRating,
+                    subscriptionRequired: book.subscriptionRequired,
+                    savedAt: new Date().toISOString(),
+                };
+                // make an api call to firebase to save the book using saveBook imported from libraryService.ts
+                // which expects these as params (userId: string , bookData: SavedBookData )
+                await saveBook(user.uid, bookData);
+                //sets "saved" state to true
+                setSaved(true);
+            }
+        } catch (err) {
+            //if toggle isn't working
+            console.error("Library toggle error:", err);
+        } finally {
+            // after it has been saved in firebase for specific user
+            setSaving(false);
+        }
+    };
 
     return (
 
@@ -150,7 +207,7 @@ export default function BookDetailPage() {
                             <div className="flex w-[24px] h-[24px]">
                                 <AiOutlineClockCircle className="w-full h-full" />
                             </div>
-                            {/* TODO WILL BE IN 4.b */}
+                            
                             <span>03:23</span>
                         </div>
                         <div className="flex items-center w-1/2 gap-1 font-medium text-[14px] text-[#032b41]">
@@ -171,7 +228,7 @@ export default function BookDetailPage() {
                     
 
                     <div className="flex gap-4 mb-6">
-                        {/* TODO — wire Read button to navigate to the reader view */}
+                        
                         <button 
                             onClick={() => handleProtectedAction(`/player/${id}`)}
                             className="flex items-center justify-center gap-2 bg-[#032b41] text-white w-[144px] h-[48px] rounded hover:opacity-80 transition-opacity"
@@ -181,7 +238,7 @@ export default function BookDetailPage() {
                             </div>
                             <span>Read</span>
                         </button>
-                        {/* TODO — wire Listen button to open AudioPlayer with book.audioLink */}
+                        
                         <button 
                             onClick={()=> handleProtectedAction(`/player/${id}`)}
                             className="flex items-center justify-center gap-2 bg-[#032b41] text-white w-[144px] h-[48px] rounded hover:opacity-80 transition-opacity"
@@ -192,12 +249,18 @@ export default function BookDetailPage() {
                             <span>Listen</span>
                         </button>
                     </div>
-                    {/* TODO — wire to Firebase: save book.id to user's library in Firestore */}                
-                    <button onClick={handleAddToLibrary} className="flex items-center gap-2 text-[#0365f2] font-medium text-[18px] mb-10 hover:text-[#044298] transition-colors">
+                    
+                    <button 
+                        onClick={handleAddToLibrary}
+                        disabled={saving} 
+                        className="flex items-center gap-2 text-[#0365f2] font-medium text-[18px] mb-10 hover:text-[#044298] transition-colors disabled:opacity-60">
                         <div className="flex w-[20px] h-[20px]">
-                            <BsBookmark className="w-full h-full"/>
+                            {saved 
+                                ? <BsBookmarkFill className="w-full h-full" />
+                                : <BsBookmark className="w-full h-full"/>
+                            }
                         </div>
-                        <span>Add Title to My Library</span>
+                        <span>{saving? "Saving..." : saved? "Saved in My Library" : "Add Title to My Library"}</span>
                     </button>
 
                     <div className="mb-6">
@@ -243,9 +306,6 @@ export default function BookDetailPage() {
         ) : (
             <div className="text-[#032b41]">Book not found.</div>
         )}
-
-        {/* TODO — add <AudioPlayer src={book?.audioLink} /> here once wired up (feature 4.b) */}
-        <audio src="https://firebasestorage.googleapis.com/v0/b/summarist.appspot.com/o/books%2Faudios%2Fthe-lean-startup.mp3?alt=media&amp;token=c2f2b1d4-eaf2-4d47-8c8a-7a8fd062a47e"></audio>
 
       </section>
 

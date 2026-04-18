@@ -128,10 +128,6 @@ export default function ForYouPage() {
     // .finally(()=> setLoadingSuggested(false));
       
   }, []);
-  useEffect(() => {
-  //console.log("Selected book updated:", selectedBook)
-  console.log("Recommended book updated:", recommended)
-}, [selectedBook])
 
   return (
     
