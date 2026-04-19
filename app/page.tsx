@@ -1,5 +1,5 @@
 "use client";
-
+//Landing Home Page
 import { AiFillFileText, AiFillBulb, AiFillAudio } from "react-icons/ai";
 import { BsStarFill, BsStarHalf } from "react-icons/bs";
 import { BiCrown } from "react-icons/bi";
@@ -7,23 +7,51 @@ import { RiLeafLine } from "react-icons/ri";
 import Image from "next/image";
 import { openModal } from "@/lib/slices/authSlice";
 import { useAppDispatch } from "@/lib/hooks";
+import { useEffect, useState } from "react";
 
-export default function Home() {
+
+
+export default function Landing() {
   const dispatch = useAppDispatch();
+  //initial state is 0 which is the default state
+  const [activeIdx, setActiveIdx] = useState<number>(0);
+
+  useEffect(()=> {
+    const interval = setInterval(()=> {
+      //checks which number prev was and then take that add 1 then modular by 6 to get 0-5
+      // then update activeIdx with setActiveIdx()
+      setActiveIdx(prev=> ((prev+1) % 6));
+    }, 2000);
+  }, []);
+  
 
   return (
     <>
+    <div className="">
+      
+      {/* .wrapper__full {
+    margin-left: 0;
+    width: 100%;
+}
+.wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin-left: 200px;
+    width: calc(100% - 200px);
+    transition: all .3s; */}
+
       {/* NAVBAR */}
       <nav className="h-20">
-        <div className="flex justify-between items-center max-w-[1070px] w-full mx-auto px-6">
+        <div className="flex justify-between items-center max-w-[1070px] w-full h-full mx-auto px-6">
           <figure className="max-w-[200px]">
             <Image className="w-full h-full" src="/assets/logo.png" alt="logo" width={200} height={50} />
           </figure>
           <ul className="flex gap-6">
             <li onClick={()=> dispatch(openModal())} className="cursor-pointer text-[#032b41] transition-colors duration-100 hover:text-[#2bd97c]">Login</li>
-            <li className="cursor-not-allowed text-[#032b41] max-sm:hidden">About</li>
-            <li className="cursor-not-allowed text-[#032b41] max-sm:hidden">Contact</li>
-            <li className="cursor-not-allowed text-[#032b41] max-sm:hidden">Help</li>
+            <li className="cursor-not-allowed text-[#032b41] max-[576px]:hidden transition-colors duration-100">About</li>
+            <li className="cursor-not-allowed text-[#032b41] max-[576px]:hidden transition-colors duration-100">Contact</li>
+            <li className="cursor-not-allowed text-[#032b41] max-[576px]:hidden transition-colors duration-100">Help</li>
           </ul>
         </div>
       </nav>
@@ -34,11 +62,11 @@ export default function Home() {
           <div className="max-w-[1070px] w-full mx-auto px-6">
             <div className="flex md:flex-row flex-col items-center text-center md:text-left">
               <div className="w-full flex flex-col items-center md:flex-col md:items-start">
-                <div className="text-[#032b41] text-4xl max-md:text-2xl font-bold mb-6">
+                <div className="text-[#032b41] text-[2.5rem] max-md:text-2xl font-bold mb-6">
                   Gain more knowledge <br className="max-md:hidden" />
                   in less time
                 </div>
-                <div className="text-[#394547] text-xl max-md:text-base font-light mb-6 leading-relaxed">
+                <div className="text-[#394547] text-xl max-md:text-base font-light mb-6 leading-normal">
                   Great summaries for busy people,
                   <br className="max-md:hidden" />
                   individuals who barely have time to read,
@@ -59,6 +87,7 @@ export default function Home() {
 
       {/* FEATURES */}
       <section id="features">
+
         <div className="py-10 w-full">
           <div className="max-w-[1070px] w-full mx-auto px-6">
             <h2 className="text-3xl max-md:text-2xl text-[#032b41] text-center mb-8 font-bold">
@@ -81,10 +110,18 @@ export default function Home() {
             {/* Statistics block 1 */}
             <div className="flex max-md:flex-col gap-20 max-md:gap-8 mb-24 max-md:mb-8">
               <div className="w-full flex flex-col justify-center">
-                {["Enhance your knowledge", "Achieve greater success", "Improve your health", "Develop better parenting skills", "Increase happiness", "Be the best version of yourself!"].map((h) => (
-                  <div key={h} className="text-3xl max-md:text-2xl font-medium text-[#6b757b] mb-4 last:mb-0">{h}</div>
+                {["Enhance your knowledge", 
+                  "Achieve greater success", 
+                  "Improve your health", 
+                  "Develop better parenting skills", 
+                  "Increase happiness", 
+                  "Be the best version of yourself!"].map((h, i) => (
+                    
+                    <div key={h} className={`text-3xl max-md:text-2xl font-medium ${i === activeIdx? 'text-[#2bd97c]' : 'text-[#6b757b]'} mb-4 last:mb-0 `} style={{animationDelay: `${i}s`}}>{h}</div>
+                                                                                              
                 ))}
               </div>
+
               <div className="w-full flex flex-col justify-center gap-6 bg-[#f1f6f4] py-10 px-6">
                 {[
                   { num: "93%", text: <>of Summarist members <b>significantly increase</b> reading frequency.</> },
@@ -114,9 +151,16 @@ export default function Home() {
                 ))}
               </div>
               <div className="w-full flex flex-col justify-center items-end max-md:items-start">
-                {["Expand your learning", "Accomplish your goals", "Strengthen your vitality", "Become a better caregiver", "Improve your mood", "Maximize your abilities"].map((h) => (
-                  <div key={h} className="text-3xl max-md:text-2xl font-medium text-[#6b757b] mb-4 last:mb-0">{h}</div>
-                ))}
+                {
+                  ["Expand your learning", 
+                    "Accomplish your goals", 
+                    "Strengthen your vitality", 
+                    "Become a better caregiver", 
+                    "Improve your mood", 
+                    "Maximize your abilities"].map((h, i) => (
+                      <div key={h} className={ `text-3xl max-md:text-2xl font-medium ${i === activeIdx?"text-[#2bd97c]":"text-[#6b757b]"} mb-4 last:mb-0` }>{h}</div>
+                    ))
+                }                                                                                                        
               </div>
             </div>
 
@@ -220,6 +264,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
+    </div>
     </>
   );
 }

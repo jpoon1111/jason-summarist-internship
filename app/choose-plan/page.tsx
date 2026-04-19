@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Accordion from "@/components/Accordion"
 import pricingTop from "@/public/assets/pricing-top.png"; // update path if needed
@@ -48,11 +48,15 @@ export default function ChoosePlanPage() {
   const user = useAppSelector((state) => state.auth.user);//← Check if user is logged in
   const isSubscribed = useAppSelector((state)=> state.auth.isSubscribed)//← Check if already subscribed
 
+  useEffect(()=>{
+
     //if user is logged in and already have a subscription then redirect them to the "/for-you" page
     if(isSubscribed){
       router.replace('/for-you');//will be redirected to for-you
       return null;// this stops all other functions after this line from running if isSubscribed is true
     }
+  },[isSubscribed, router])
+
   
   const handleSubcribe =async () => {
       // Check if user is logged in(this is the guard if they are not signed in )
