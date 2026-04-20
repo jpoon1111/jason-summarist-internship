@@ -109,10 +109,10 @@ export default function SearchBar() {
           <div></div>
           
           {/* Search */}
-          <div className='flex items-center w-full gap-[24px] max-w-[340px]'>
+          <div className='flex items-center w-full gap-6 max-w-[340px]'>
             <div className='flex items-center w-full'>
-              <div className='relative w-full'>
-                <input suppressHydrationWarning placeholder="Search for books" type="text" value={query} onChange={(e) => setQuery(e.target.value)} className='h-10 w-full px-4 pr-10 outline-none bg-[#f1f6f4] text-[14px] text-[#042330] border-2 border-[#e1e7ea] rounded-lg focus:border-[#2be080] transition-all'/>
+              <div className='relative w-full gap-2'>
+                <input suppressHydrationWarning placeholder="Search for books" type="text" value={query} onChange={(e) => setQuery(e.target.value)} className='h-10 w-full px-4 outline-none bg-[#f1f6f4] text-[14px] text-[#042330] border-2 border-[#e1e7ea] rounded-lg focus:border-[#2be080] transition-all'/>
                 {/* This is the Search Bar that shows a close icon or a search icon*/}
                 <div className='absolute right-[8px] top-0 flex h-full items-center justify-end border-l-2 border-[#e1e7ea] pl-2'>
                   {query ? (
@@ -129,10 +129,10 @@ export default function SearchBar() {
                 </div>
               </div>
             </div>
-          </div>
-          {/* Hamburger Menu -mobile only*/}
-          <div className='flex md:hidden items-center justify-center cursor-pointer'>
-            <RxHamburgerMenu className='w-6 h-6 text-[#03314b]'></RxHamburgerMenu>
+            {/* Hamburger Menu -mobile only*/}
+            <div className='flex md:hidden items-center justify-center cursor-pointer'>
+              <RxHamburgerMenu className='w-6 h-6 text-[#03314b]'></RxHamburgerMenu>
+            </div>
           </div>
           
           {/* This is showing the actual drop down results based on search */}
