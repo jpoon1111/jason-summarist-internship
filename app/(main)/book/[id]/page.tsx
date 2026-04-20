@@ -21,7 +21,6 @@ import { isBookSaved, saveBook, type SavedBookData } from "@/lib/libraryService"
 import { unsavedBook } from "@/lib/libraryService";
 
 
-
 const BASE_URL = "https://us-central1-summaristt.cloudfunctions.net/getBook";
 
 const shimmer: React.CSSProperties = {
@@ -311,3 +310,6 @@ export default function BookDetailPage() {
 
   );
 }
+
+
+
