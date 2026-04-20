@@ -33,7 +33,8 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="bg-[#f7faf9] w-[200px] min-w-[200px] fixed top-0 left-0 h-screen z-[1000] transition-all duration-300">
+    // <div classN "bg-[#f7faf9] w-[200px] min-w-[200px] fixed top-0 left-0 h-screen z-[1000] transition-all duration-300 max-md:-translate-x-full">
+    <div className="bg-[#f7faf9] w-[200px] min-w-[200px] fixed top-0 left-0 h-screen z-[1000] transition-all duration-300 max-md:-translate-x-full">
       <div className="flex items-center justify-center h-[60px] pt-4 max-w-[160px] mx-auto">
         <Link href="/">
         <Image src={summaristLogo} alt="Summarist" width={495} height={114} className="w-full h-[40px] object-contain" style={{color: "transparent"}} />

@@ -27,19 +27,6 @@ export default function Landing() {
 
   return (
     <>
-    <div className="">
-      
-      {/* .wrapper__full {
-    margin-left: 0;
-    width: 100%;
-}
-.wrapper {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    margin-left: 200px;
-    width: calc(100% - 200px);
-    transition: all .3s; */}
 
       {/* NAVBAR */}
       <nav className="h-20">
@@ -264,7 +251,7 @@ export default function Landing() {
           </div>
         </div>
       </footer>
-    </div>
+
     </>
   );
 }

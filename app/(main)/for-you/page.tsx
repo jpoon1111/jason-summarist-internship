@@ -133,6 +133,9 @@ export default function ForYouPage() {
 
     
     
+
+    
+    
     <div className="max-w-[1070px] w-full mx-auto px-6">
       <div className="py-10 w-full">
         {loading? (
@@ -154,12 +157,16 @@ export default function ForYouPage() {
           
             href={`/book/${selectedBook.id}`}
             className="flex justify-between w-full bg-[#fbefd6] rounded-sm p-6 mb-6 gap-6 no-underline text-inherit hover:bg-[#f3e4c8] transition-colors max-[1200px]:w-full max-[768px]:w-full max-[768px]:flex-col max-[768px]:gap-6 max-[576px]:p-4"
+            className="flex justify-between w-full bg-[#fbefd6] rounded-sm p-6 mb-6 gap-6 no-underline text-inherit hover:bg-[#f3e4c8] transition-colors max-[1200px]:w-full max-[768px]:w-full max-[768px]:flex-col max-[768px]:gap-6 max-[576px]:p-4"
           >
+            
             <div className="text-[#032b41] w-[40%] max-[768px]:text-[14px] max-[768px]:w-full">
               {selectedBook.subTitle}
             </div>
             <div className="w-[1px] bg-[#bac8ce] max-[768px]:hidden"></div>
+            <div className="w-[1px] bg-[#bac8ce] max-[768px]:hidden"></div>
             <div className="flex gap-4 w-[60%]">
+              
               <figure className="w-[140px] h-[140px] min-w-[140px] rounded-lg overflow-hidden">
                 <Image
                   src={selectedBook.imageLink}
@@ -172,7 +179,6 @@ export default function ForYouPage() {
               
               <div className="w-full">
                 <h3 className="font-semibold text-[#032b41] mb-2">{selectedBook.title}</h3>
-                {/* <div className="font-semibold text-[#032b41] mb-2">{selectedBook.title}</div> */}
                 <div className="text-[#394547] text-[14px] mb-4">{selectedBook.author}</div>
                 <div className="flex items-center gap-2">
                   <div className="flex items-center justify-center w-10 h-10 bg-black rounded-full pl-[3px]">
