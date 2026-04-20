@@ -156,14 +156,12 @@ export default function ForYouPage() {
           <Link
           
             href={`/book/${selectedBook.id}`}
-            className="flex justify-between w-full bg-[#fbefd6] rounded-sm p-6 mb-6 gap-6 no-underline text-inherit hover:bg-[#f3e4c8] transition-colors max-[1200px]:w-full max-[768px]:w-full max-[768px]:flex-col max-[768px]:gap-6 max-[576px]:p-4"
-            className="flex justify-between w-full bg-[#fbefd6] rounded-sm p-6 mb-6 gap-6 no-underline text-inherit hover:bg-[#f3e4c8] transition-colors max-[1200px]:w-full max-[768px]:w-full max-[768px]:flex-col max-[768px]:gap-6 max-[576px]:p-4"
+            className="flex justify-between w-full bg-[#fbefd6] rounded-sm p-6 mb-6 gap-6 no-underline text-inherit hover:bg-[#f3e4c8] transition-colors max-[1200px]:w-full max-[768px]:w-full max-[768px]:flex-col max-[768px]:gap-6 max-[576px]:p-4"    
           >
             
             <div className="text-[#032b41] w-[40%] max-[768px]:text-[14px] max-[768px]:w-full">
               {selectedBook.subTitle}
             </div>
-            <div className="w-[1px] bg-[#bac8ce] max-[768px]:hidden"></div>
             <div className="w-[1px] bg-[#bac8ce] max-[768px]:hidden"></div>
             <div className="flex gap-4 w-[60%]">
               

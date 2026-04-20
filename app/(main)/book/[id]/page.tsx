@@ -140,7 +140,7 @@ export default function BookDetailPage() {
             //check if saved is (false === false) (because the initial state is set to false that books are not saved by default)
             if(saved){
                 // Toggle off - to remove from library by running an async call unsaveBook imported from libraryService
-                await unsaveBook(user.uid, id);
+                await unsavedBook(user.uid, id);
                 setSaved(false);
             } else {
                 //Save to library that will be the same shape/blueprint of SavedBookData imported from libraryService.ts
