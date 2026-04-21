@@ -53,7 +53,6 @@ export default function ChoosePlanPage() {
     //if user is logged in and already have a subscription then redirect them to the "/for-you" page
     if(isSubscribed){
       router.replace('/for-you');//will be redirected to for-you
-      return;// this stops all other functions after this line from running if isSubscribed is true
     }
   },[isSubscribed, router])
 
