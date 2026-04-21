@@ -21,6 +21,8 @@ import {
 import { auth } from "@/lib/firebase"; // auth is imported from local firebase config — the initialized Firebase app instance(because you have it set to getAuth in firebase you dont need to import auth and app to do it here)
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"; // typed Redux hooks imported from local hooks file
 import { closeModal } from "@/lib/slices/authSlice"; // closeModal is a Redux action imported from local authSlice — sets modalOpen to false
+import { useClickOutside } from "@/app/hooks/useClickOutside";
+
 
 type Mode = "login" | "register" | "forgot"; // TypeScript union type — defines the 3 possible form views
 
@@ -37,6 +39,14 @@ export default function AuthModal(){
     // router is initialized here using useRouter (imported from next/navigation)
     // used to navigate the user after a successful auth action e.g. router.push("/for-you")
     const router = useRouter();
+
+    // Clicks outside on Grey area to close Modal
+    // You must attach modalRef to the page div container element that represents the modal (the area you want to consider "inside").
+    // this  refernce the useClickOutside func that is imported then store it in modalRef that will be used as a ref in the Div
+    const modalRef = useClickOutside(() => {
+        dispatch(closeModal());
+    });
+
 
     // mode — defined here, default is "login"
     // controls which form view is rendered: "login" | "register" | "forgot"
@@ -72,6 +82,7 @@ export default function AuthModal(){
     // Early return — if modalOpen (from Redux state) is false, render nothing
     // This unmounts the modal from the DOM entirely when it's closed
     if (!modalOpen) return null;
+
 
     // getErrorMessage — defined here inside the component
     // takes a Firebase error code string and returns a human-readable message
@@ -163,8 +174,8 @@ export default function AuthModal(){
     }
 
     return (
-    // Dark semi-transparent overlay covering the full screen
-    <div className="fixed inset-0 bg-black/75 flex justify-center items-center z-[9999] w-full">
+    // Master Container - Dark semi-transparent overlay covering the full screen
+    <div ref={modalRef} className="fixed inset-0 bg-black/75 flex justify-center items-center z-[9999] w-full">
 
         {/* White modal box — centered, max width 400px */}
         <div className="auth__modal relative bg-white rounded-lg shadow-lg w-full max-w-[400px] z-[9999]">

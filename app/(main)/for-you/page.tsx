@@ -130,11 +130,6 @@ export default function ForYouPage() {
   }, []);
 
   return (
-
-    
-    
-
-    
     
     <div className="max-w-[1070px] w-full mx-auto px-6">
       <div className="py-10 w-full">
