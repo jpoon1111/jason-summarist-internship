@@ -22,7 +22,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <>
-      <Sidebar isOpen={sidebarOpen} onClose={()=> dispatch(closeSidebar())} />
+      <Sidebar />
       <main className="min-h-screen w-full transition-all duration-300 ml-0 min-[769px]:ml-[200px] min-[769px]:w-[calc(100%-200px)]">
         <SearchBar onHamburgerClick={()=> dispatch(openSidebar())} />
         {/* Overlay when Login */}
