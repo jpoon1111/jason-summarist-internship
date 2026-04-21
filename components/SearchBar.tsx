@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react'
 import { useState } from 'react'
 import Link from 'next/link'
@@ -24,7 +23,11 @@ function formatDuration(secs:number) {
 
 const SEARCH_URL = "https://us-central1-summaristt.cloudfunctions.net/getBooksByAuthorOrTitle"
 
-export default function SearchBar() {
+interface SearchProp{
+  onHamburgerClick: ()=> void;
+}
+
+export default function SearchBar({onHamburgerClick} : SearchProp) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Book[]>([]);
   const [loading, setLoading] = useState(false);
@@ -130,7 +133,9 @@ export default function SearchBar() {
               </div>
             </div>
             {/* Hamburger Menu -mobile only*/}
-            <div className='flex md:hidden items-center justify-center cursor-pointer'>
+            <div
+              onClick={onHamburgerClick} 
+              className='flex md:hidden items-center justify-center cursor-pointer'>
               <RxHamburgerMenu className='w-6 h-6 text-[#03314b]'></RxHamburgerMenu>
             </div>
           </div>

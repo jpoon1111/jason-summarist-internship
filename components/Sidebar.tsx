@@ -1,23 +1,34 @@
 "use client";
+// TODO Sidebar implementation Sidebar OPEN CLOSE
+
+
 
 import Image from 'next/image';
 import summaristLogo from "../public/assets/summarist-logo.webp";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { AiFillHome, AiOutlineLogin, AiOutlineLogout, AiOutlineQuestionCircle, AiOutlineSearch, AiOutlineSetting } from 'react-icons/ai';
-import { BsBookmark, BsPencil } from 'react-icons/bs';
+import { useClickOutside } from '@/app/hooks/useClickOutside';
+import { closeSidebar } from '@/lib/slices/sidebarSlice';
 import { openModal } from '@/lib/slices/authSlice';
 import { RootState } from '@/lib/store';
 import { auth } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
+import { AiFillHome, AiOutlineLogin, AiOutlineLogout, AiOutlineQuestionCircle, AiOutlineSearch, AiOutlineSetting } from 'react-icons/ai';
+import { BsBookmark, BsPencil } from 'react-icons/bs';
+
 
 export default function Sidebar() {
   const pathname = usePathname();
   const dispatch = useAppDispatch();
+  const isOpen = useAppSelector((state)=> state.sidebar.isOpen);
   const user = useAppSelector( (state:RootState) =>state.auth.user)
 
 
+  const sidebarRef = useClickOutside(()=> {
+    dispatch(closeSidebar());
+  })
+  
   const isActive = (path:string) => pathname === path;
 
   const handleAuthAction = async () => {
@@ -33,7 +44,10 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="bg-[#f7faf9] w-[200px] min-w-[200px] fixed top-0 left-0 h-screen z-[1000] transition-all duration-300 max-md:-translate-x-full">
+    <div 
+      ref={sidebarRef}
+      className={`bg-[#f7faf9] w-[200px] min-w-[200px] fixed top-0 left-0 h-screen z-[1000] transition-all duration-300
+      ${isOpen? "translate-x-0":"-translate-x-full"} max-md:-translate-x-0`}>
       <div className="flex items-center justify-center h-[60px] pt-4 max-w-[160px] mx-auto">
         <Link href="/">
         <Image src={summaristLogo} alt="Summarist" width={495} height={114} className="w-full h-[40px] object-contain" style={{color: "transparent"}} />
@@ -41,7 +55,7 @@ export default function Sidebar() {
     </div>
     <div className="flex flex-col justify-between h-[calc(100vh-60px)] pb-5">
       <div className="flex-1 mt-10">
-        <Link href="/for-you" className="flex items-center h-14 text-[#032b41] mb-2 cursor-pointer hover:bg-[#f0efef]">
+        <Link href="/for-you" onClick={()=> dispatch(closeSidebar())} className="flex items-center h-14 text-[#032b41] mb-2 cursor-pointer hover:bg-[#f0efef]">
           <div className={`w-[5px] h-full mr-4 ${isActive("/for-you") ? "bg-[#2bd97c]" : "bg-transparent"}`} />
 
           <div className="flex items-center justify-center mr-2 w-6 h-6">
@@ -52,7 +66,7 @@ export default function Sidebar() {
 
         </Link>
 
-        <Link href="/library" className='flex items-center h-14 text-[#032b41] mb-2 cursor-pointer hover:bg-[#f0efef]'>
+        <Link href="/library" onClick={()=> dispatch(closeSidebar())} className='flex items-center h-14 text-[#032b41] mb-2 cursor-pointer hover:bg-[#f0efef]'>
           <div className={`w-[5px] h-full mr-4 ${isActive("/library") ? "bg-[#2bd97c]" : "bg-transparent"}`} />
           <div className='flex intes center justify-center mr-2 w-6 h-6'>
             <BsBookmark size={24} />
@@ -78,7 +92,7 @@ export default function Sidebar() {
       </div>
 
       <div>
-        <Link href="/settings" className='flex items-center h-14 text-[#032b41] mb-2 cursor-pointer hover:bg-[#f0efef]'>
+        <Link href="/settings" onClick={()=> dispatch(closeSidebar())} className='flex items-center h-14 text-[#032b41] mb-2 cursor-pointer hover:bg-[#f0efef]'>
           <div className={`w-[5px] h-full mr-4 ${isActive("/settings") ? "bg-[#2bd97c]" : "bg-transparent"}`}></div>
           <div className='flex items-center justify-center mr-2 w-6 h-6'>
             <AiOutlineSetting size={24} />

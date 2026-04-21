@@ -22,7 +22,11 @@ import { configureStore } from "@reduxjs/toolkit";
 // when an action is dispatched (e.g. setUser, openModal)
 // authReducer handles all auth-related state changes
 // The path "./slices/authSlice" points to lib/slices/authSlice.ts
-import authSlice from "./slices/authSlice";
+import authReducer from "./slices/authSlice";
+
+
+// sidebar state
+import sidebarReducer from './slices/sidebarSlice';
 
 
 // LINE 3 — creating the store and exporting it
@@ -49,7 +53,10 @@ export const store = configureStore({
         // The key name "auth" is what you reference in useAppSelector
         // e.g. state.auth.user    ← reads the user
         // e.g. state.auth.modalOpen  ← reads if modal is open
-        auth: authSlice,
+        auth: authReducer,
+
+        //create a key to hold sidebarSlice
+        sidebar: sidebarReducer,
 
     },
 });
