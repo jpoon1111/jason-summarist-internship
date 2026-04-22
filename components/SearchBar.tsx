@@ -134,8 +134,11 @@ export default function SearchBar({onHamburgerClick} : SearchProp) {
             </div>
             {/* Hamburger Menu -mobile only*/}
             <div
-              onClick={onHamburgerClick} 
-              className='flex md:hidden items-center justify-center cursor-pointer'>
+              onClick={(e) => { 
+                e.stopPropagation();
+                onHamburgerClick();
+              }}
+              className='flex md:hidden items-center justify-center cursor-pointer hamburger-menu '>
               <RxHamburgerMenu className='w-6 h-6 text-[#03314b]'></RxHamburgerMenu>
             </div>
           </div>

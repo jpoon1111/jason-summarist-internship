@@ -4,6 +4,15 @@
 @theme {
   /* global font */
   --font-sans: "Roboto", ui-sans-serif, system-ui, sans-serif;
+
+  /* Colors – change these values to rebrand the whole app */
+  --color-primary: 
+
+}
+
+@theme {
+  /* Font */
+  --font-sans: "Roboto", ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {

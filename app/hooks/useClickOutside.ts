@@ -5,6 +5,12 @@ export function useClickOutside(callback: ()=> void) {
 
     useEffect(()=>{
         function handleClickOutside(event: MouseEvent) {
+            const target = event.target as HTMLElement;
+
+            if(target.closest('.hamburger-menu')){
+                return;
+            }
+
             if(ref.current && !ref.current.contains(event.target as Node)){
                 callback();
             }
